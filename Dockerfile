@@ -1,6 +1,6 @@
-FROM ubuntu:22.04
+FROM ubuntu:18.04
 RUN apt update
-RUN apt install openjdk-8-jdk libwebkitgtk-6.0-4 -y && \
+RUN apt install lsb-release openjdk-8-jdk libwebkitgtk-1.0-0 libcanberra-gtk-module -y && \
     update-alternatives --config java && \
     apt install default-jre -y
 RUN rm -rf /var/lib/apt/list/*
