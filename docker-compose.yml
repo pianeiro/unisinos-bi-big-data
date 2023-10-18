@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  pdi:
+    image: pdi
+    container_name: pdi
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${PWD}:/workdir
