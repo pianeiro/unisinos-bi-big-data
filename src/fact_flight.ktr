@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>fact_flights</name>
+    <name>fact_flight</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -427,89 +427,94 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2023/10/25 00:03:28.983</created_date>
+    <created_date>2023/11/05 15:52:34.362</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2023/10/25 00:03:28.983</modified_date>
-    <key_for_session_key/>
+    <modified_date>2023/11/05 15:52:34.362</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <order>
     <hop>
-      <from>Load raw CSV file</from>
-      <to>Sort ORIGIN_AIRPORT</to>
+      <from>CSV file input</from>
+      <to>Add FLIGHT_ID</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Sort ORIGIN_AIRPORT</from>
-      <to>Merge AIRPORT_ID</to>
+      <from>Add FLIGHT_ID</from>
+      <to>Add leading zeros to MONTH and DAY columns</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Load dim_airports table</from>
-      <to>Merge AIRPORT_ID</to>
+      <from>Add leading zeros to MONTH and DAY columns</from>
+      <to>Create DATE column</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Merge AIRPORT_ID</from>
-      <to>Sort DESTINATION_AIRPORT</to>
+      <from>Create DATE column</from>
+      <to>Sort by AIRLINE</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Sort DESTINATION_AIRPORT</from>
-      <to>Rename ID</to>
+      <from>Sort by AIRLINE</from>
+      <to>Merge AIRLINE dimmension</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Rename ID</from>
-      <to>Merge AIRPORT_ID 2</to>
+      <from>Load AIRLINE dimmension</from>
+      <to>Merge AIRLINE dimmension</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Load dim_airports table</from>
-      <to>Merge AIRPORT_ID 2</to>
+      <from>Merge AIRLINE dimmension</from>
+      <to>Sort by ORIGIN_AIRPORT</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Merge AIRPORT_ID 2</from>
-      <to>Rename ID 2</to>
+      <from>Sort by ORIGIN_AIRPORT</from>
+      <to>Merge AIRPORT dim to ORGIN_AIRPORT</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Rename ID 2</from>
-      <to>Sort AIRLINE</to>
+      <from>Load AIRPORT dimmension</from>
+      <to>Merge AIRPORT dim to ORGIN_AIRPORT</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Sort AIRLINE</from>
-      <to>Merge AIRLINE</to>
+      <from>Merge AIRPORT dim to ORGIN_AIRPORT</from>
+      <to>Sort by DESTINATION_AIRPORT</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Load dim_airlines table</from>
-      <to>Merge AIRLINE</to>
+      <from>Sort by DESTINATION_AIRPORT</from>
+      <to>Merge join</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Merge AIRLINE</from>
-      <to>Concat fields</to>
+      <from>Load AIRPORT dimmension</from>
+      <to>Merge join</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Concat fields</from>
-      <to>Select values</to>
+      <from>Merge join</from>
+      <to>Sort by FLIGHT</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values</from>
-      <to>Text file output</to>
+      <from>Sort by FLIGHT</from>
+      <to>Remove unused columns</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Remove unused columns</from>
+      <to>Save fact table</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Load dim_airlines table</name>
-    <type>CsvInput</type>
+    <name>Add FLIGHT_ID</name>
+    <type>Sequence</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -518,42 +523,67 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>/workdir/data/dim_airlines.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>;</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
+    <valuename>FLIGHT_ID</valuename>
+    <use_database>N</use_database>
+    <connection/>
+    <schema/>
+    <seqname>SEQ_</seqname>
+    <use_counter>Y</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>64</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Add leading zeros to MONTH and DAY columns</name>
+    <type>StringOperations</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
-        <name>AIRLINE_ID</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>$</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
+        <in_stream_name>MONTH</in_stream_name>
+        <out_stream_name>MONTH</out_stream_name>
+        <trim_type/>
+        <lower_upper/>
+        <padding_type>left</padding_type>
+        <pad_char>0</pad_char>
+        <pad_len>2</pad_len>
+        <init_cap/>
+        <mask_xml/>
+        <digits/>
+        <remove_special_characters/>
       </field>
       <field>
-        <name>AIRLINE</name>
-        <type>String</type>
-        <format/>
-        <currency>$</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>2</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <in_stream_name>DAY</in_stream_name>
+        <out_stream_name>DAY</out_stream_name>
+        <trim_type/>
+        <lower_upper/>
+        <padding_type>left</padding_type>
+        <pad_char>0</pad_char>
+        <pad_len>2</pad_len>
+        <init_cap/>
+        <mask_xml/>
+        <digits/>
+        <remove_special_characters/>
       </field>
     </fields>
     <attributes/>
@@ -565,13 +595,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>928</xloc>
-      <yloc>48</yloc>
+      <xloc>336</xloc>
+      <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Load dim_airports table</name>
+    <name>CSV file input</name>
     <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -581,70 +611,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>/workdir/data/dim_airports.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>;</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
-    <fields>
-      <field>
-        <name>AIRPORT_ID</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>$</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>AIRPORT_NAME</name>
-        <type>String</type>
-        <format/>
-        <currency>$</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>3</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>448</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Load raw CSV file</name>
-    <type>CsvInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filename>/workdir/data/flight_lighter.csv</filename>
+    <filename>/workdir/data/flight_lite.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -661,7 +628,7 @@
     <fields>
       <field>
         <name>YEAR</name>
-        <type>Integer</type>
+        <type>String</type>
         <format>#</format>
         <currency>$</currency>
         <decimal>.</decimal>
@@ -672,7 +639,7 @@
       </field>
       <field>
         <name>MONTH</name>
-        <type>Integer</type>
+        <type>String</type>
         <format>#</format>
         <currency>$</currency>
         <decimal>.</decimal>
@@ -683,7 +650,7 @@
       </field>
       <field>
         <name>DAY</name>
-        <type>Integer</type>
+        <type>String</type>
         <format>#</format>
         <currency>$</currency>
         <decimal>.</decimal>
@@ -779,13 +746,413 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>16</xloc>
-      <yloc>112</yloc>
+      <xloc>96</xloc>
+      <yloc>64</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Sort ORIGIN_AIRPORT</name>
+    <name>Create DATE column</name>
+    <type>ConcatFields</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <separator>/</separator>
+    <enclosure>"</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>N</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name/>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>N</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery>0</splitevery>
+    </file>
+    <fields>
+      <field>
+        <name>YEAR</name>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>MONTH_1</name>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>DAY_1</name>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+    <ConcatFields>
+      <targetFieldName>DATE</targetFieldName>
+      <targetFieldLength>0</targetFieldLength>
+      <removeSelectedFields>N</removeSelectedFields>
+    </ConcatFields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Load AIRLINE dimmension</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>/workdir/dw/dim_airline.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>AIRLINE_ID</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>AIRLINE_NAME</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>2</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>880</xloc>
+      <yloc>336</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Load AIRPORT dimmension</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>/workdir/dw/dim_airport.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>AIRPORT_ID</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>AIRPORT_NAME</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>880</xloc>
+      <yloc>512</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Merge AIRLINE dimmension</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>INNER</join_type>
+    <step1>Sort by AIRLINE</step1>
+    <step2>Load AIRLINE dimmension</step2>
+    <keys_1>
+      <key>AIRLINE</key>
+    </keys_1>
+    <keys_2>
+      <key>AIRLINE_NAME</key>
+    </keys_2>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>336</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Merge AIRPORT dim to ORGIN_AIRPORT</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>INNER</join_type>
+    <step1>Sort by ORIGIN_AIRPORT</step1>
+    <step2>Load AIRPORT dimmension</step2>
+    <keys_1>
+      <key>ORIGIN_AIRPORT</key>
+    </keys_1>
+    <keys_2>
+      <key>AIRPORT_NAME</key>
+    </keys_2>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>448</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Merge join</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>INNER</join_type>
+    <step1>Sort by DESTINATION_AIRPORT</step1>
+    <step2>Load AIRPORT dimmension</step2>
+    <keys_1>
+      <key>DESTINATION_AIRPORT</key>
+    </keys_1>
+    <keys_2>
+      <key>AIRPORT_NAME</key>
+    </keys_2>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>560</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Remove unused columns</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>FLIGHT_ID</name>
+      </field>
+      <field>
+        <name>DATE</name>
+      </field>
+      <field>
+        <name>FLIGHT_NUMBER</name>
+      </field>
+      <field>
+        <name>TAIL_NUMBER</name>
+      </field>
+      <field>
+        <name>DEPARTURE_DELAY</name>
+      </field>
+      <field>
+        <name>ARRIVAL_DELAY</name>
+      </field>
+      <field>
+        <name>AIRLINE_ID</name>
+      </field>
+      <field>
+        <name>AIRPORT_ID</name>
+        <rename>ORIGIN_AIRPORT_ID</rename>
+      </field>
+      <field>
+        <name>AIRPORT_ID_1</name>
+        <rename>DESTINATION_AIRPORT_ID</rename>
+      </field>
+      <select_unspecified>N</select_unspecified>
+      <meta>
+        <name>DATE</name>
+        <rename>DATE</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyy/MM/dd</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>688</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Sort by AIRLINE</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -804,9 +1171,9 @@
     <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>ORIGIN_AIRPORT</name>
+        <name>AIRLINE</name>
         <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
+        <case_sensitive>Y</case_sensitive>
         <collator_enabled>N</collator_enabled>
         <collator_strength>0</collator_strength>
         <presorted>N</presorted>
@@ -821,47 +1188,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
-      <yloc>112</yloc>
+      <xloc>336</xloc>
+      <yloc>336</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Merge AIRPORT_ID</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <join_type>INNER</join_type>
-    <step1>Sort ORIGIN_AIRPORT</step1>
-    <step2>Load dim_airports table</step2>
-    <keys_1>
-      <key>ORIGIN_AIRPORT</key>
-    </keys_1>
-    <keys_2>
-      <key>AIRPORT_NAME</key>
-    </keys_2>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>352</xloc>
-      <yloc>112</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Sort DESTINATION_AIRPORT</name>
+    <name>Sort by DESTINATION_AIRPORT</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -897,183 +1230,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>448</xloc>
-      <yloc>176</yloc>
+      <xloc>336</xloc>
+      <yloc>560</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Rename ID</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>YEAR</name>
-        <rename/>
-      </field>
-      <field>
-        <name>MONTH</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>AIRLINE</name>
-        <rename/>
-      </field>
-      <field>
-        <name>FLIGHT_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>TAIL_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DESTINATION_AIRPORT</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DEPARTURE_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>ARRIVAL_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>AIRPORT_ID</name>
-        <rename>ORIGIN_AIRPORT_ID</rename>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>640</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Merge AIRPORT_ID 2</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <join_type>INNER</join_type>
-    <step1>Rename ID</step1>
-    <step2>Load dim_airports table</step2>
-    <keys_1>
-      <key>DESTINATION_AIRPORT</key>
-    </keys_1>
-    <keys_2>
-      <key>AIRPORT_NAME</key>
-    </keys_2>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>640</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Rename ID 2</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>YEAR</name>
-        <rename/>
-      </field>
-      <field>
-        <name>MONTH</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>AIRLINE</name>
-        <rename/>
-      </field>
-      <field>
-        <name>FLIGHT_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>TAIL_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DEPARTURE_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>ARRIVAL_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>ORIGIN_AIRPORT_ID</name>
-        <rename/>
-      </field>
-      <field>
-        <name>AIRPORT_ID</name>
-        <rename>DESTINATION_AIRPORT_ID</rename>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>784</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Sort AIRLINE</name>
+    <name>Sort by FLIGHT</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1092,7 +1255,49 @@
     <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AIRLINE</name>
+        <name>FLIGHT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>Y</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>688</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Sort by ORIGIN_AIRPORT</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>ORIGIN_AIRPORT</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <collator_enabled>N</collator_enabled>
@@ -1109,205 +1314,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>784</xloc>
-      <yloc>176</yloc>
+      <xloc>336</xloc>
+      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Merge AIRLINE</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <join_type>INNER</join_type>
-    <step1>Sort AIRLINE</step1>
-    <step2>Load dim_airlines table</step2>
-    <keys_1>
-      <key>AIRLINE</key>
-    </keys_1>
-    <keys_2>
-      <key>AIRLINE</key>
-    </keys_2>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>928</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Concat fields</name>
-    <type>ConcatFields</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <separator>/</separator>
-    <enclosure/>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>N</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding/>
-    <endedLine/>
-    <fileNameInField>N</fileNameInField>
-    <fileNameField/>
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name/>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>txt</extention>
-      <append>N</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format/>
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>YEAR</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>MONTH</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>DAY</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-    <ConcatFields>
-      <targetFieldName>DATE</targetFieldName>
-      <targetFieldLength>0</targetFieldLength>
-      <removeSelectedFields>N</removeSelectedFields>
-    </ConcatFields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>448</xloc>
-      <yloc>272</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>FLIGHT_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>TAIL_NUMBER</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DEPARTURE_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>ARRIVAL_DELAY</name>
-        <rename/>
-      </field>
-      <field>
-        <name>ORIGIN_AIRPORT_ID</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DESTINATION_AIRPORT_ID</name>
-        <rename/>
-      </field>
-      <field>
-        <name>AIRLINE_ID</name>
-        <rename/>
-      </field>
-      <field>
-        <name>DATE</name>
-        <rename/>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>784</xloc>
-      <yloc>256</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Text file output</name>
+    <name>Save fact table</name>
     <type>TextFileOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1331,7 +1344,7 @@
     <fileNameField/>
     <create_parent_folder>Y</create_parent_folder>
     <file>
-      <name>/workdir/data/fact_flights</name>
+      <name>/workdir/dw/fact_flight</name>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention>csv</extention>
@@ -1358,8 +1371,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>928</xloc>
-      <yloc>256</yloc>
+      <xloc>896</xloc>
+      <yloc>688</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

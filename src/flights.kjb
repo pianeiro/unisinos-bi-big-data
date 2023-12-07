@@ -315,7 +315,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>/workdir/src/dim_airports.ktr</filename>
+      <filename>/workdir/src/dim_airport.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -354,7 +354,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>/workdir/src/dim_arlines.ktr</filename>
+      <filename>${Internal.Entry.Current.Directory}/dim_airline.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -393,7 +393,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>/workdir/src/fact_flights.ktr</filename>
+      <filename>/workdir/src/fact_flight.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
